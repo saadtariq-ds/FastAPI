@@ -6,8 +6,7 @@ from enemy import *
 from zombie import *
 from ogre import *
 
-def battle(enemy1: Enemy, enemy2: Enemy
-           ):
+def battle(enemy1: Enemy, enemy2: Enemy):
     enemy1.talk()
     enemy2.talk()
 
