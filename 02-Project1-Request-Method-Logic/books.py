@@ -3,6 +3,16 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-@app.get("/api-endpoint")
-async def first_api():
-    return {"message": "Hello Saad!"}
+BOOKS = [
+    {"title": "To Kill a Mockingbird", "author": "Harper Lee", "category": "Fiction"},
+    {"title": "A Brief History of Time", "author": "Stephen Hawking", "category": "Science"},
+    {"title": "The Lean Startup", "author": "Eric Ries", "category": "Business"},
+    {"title": "1984", "author": "George Orwell", "category": "Dystopian"},
+    {"title": "The Art of War", "author": "Sun Tzu", "category": "Philosophy"},
+    {"title": "Sapiens: A Brief History of Humankind", "author": "Yuval Noah Harari", "category": "History"}
+]
+
+
+@app.get("/books")
+async def read_all_books():
+    return BOOKS
