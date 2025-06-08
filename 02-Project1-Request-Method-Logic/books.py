@@ -39,6 +39,19 @@ async def read_category_by_query(category: str):
     return books_to_return
 
 
+"""
+Get all books from a specific author using path or query parameter
+"""
+@app.get("/books/by_author/")
+async def read_books_by_author(author: str):
+    books_to_return = []
+    for book in BOOKS:
+        if book.get("author").casefold() == author.casefold():
+            books_to_return.append(book)
+
+    return books_to_return
+
+
 # Path and Query Parameter
 @app.get("/books/{book_author}/")
 async def read_author_category_by_query(book_author: str, category: str):
