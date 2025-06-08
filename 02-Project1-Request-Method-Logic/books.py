@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 
 app = FastAPI()
 
@@ -12,7 +12,9 @@ BOOKS = [
     {"title": "Sapiens: A Brief History of Humankind", "author": "Yuval Noah Harari", "category": "History"}
 ]
 
-
+####################################################
+#              G E T    R E Q U E S T              #
+####################################################
 @app.get("/books")
 async def read_all_books():
     return BOOKS
@@ -47,3 +49,11 @@ async def read_author_category_by_query(book_author: str, category: str):
             books_to_return.append(book)
 
     return books_to_return
+
+
+####################################################
+#             P O S T    R E Q U E S T             #
+####################################################
+@app.post("/books/create_book")
+async def create_book(new_book=Body()):
+    BOOKS.append(new_book)
