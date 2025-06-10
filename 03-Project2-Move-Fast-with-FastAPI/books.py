@@ -11,13 +11,15 @@ class Book:
     author: str
     description: str
     rating: int
+    published_date: int
 
-    def __init__(self, id, title, author, description, rating):
+    def __init__(self, id, title, author, description, rating, published_date):
         self.id = id
         self.title = title
         self.author = author
         self.description = description
         self.rating = rating
+        self.published_date = published_date
 
 
 class BookRequest(BaseModel):
@@ -26,6 +28,7 @@ class BookRequest(BaseModel):
     author: str = Field(min_length=1)
     description: str = Field(min_length=1, max_length=100)
     rating: int = Field(gt=0, lt=20)
+    published_date: int = Field(gt=1999, lt=2031)
 
     model_config = {
         "json_schema_extra" : {
@@ -33,19 +36,20 @@ class BookRequest(BaseModel):
                 "title": "A new book",
                 "author": "codingwithroby",
                 "description": "A new description",
-                "rating": 5
+                "rating": 5,
+                "published_date": 2029
             }
         }
     }
 
 
 BOOKS = [
-    Book(id=1, title="Computer Science Pro", author="codingwithroby", description="A very nice book!", rating=5),
-    Book(id=2, title="Be Fast with FastAPI", author="codingwithroby", description="A great book!", rating=5),
-    Book(id=3, title="Master Endpoints", author="codingwithroby", description="A awesome book!", rating=5),
-    Book(id=4, title="HP1", author="Author 1", description="Book Description", rating=2),
-    Book(id=5, title="HP2", author="Author 2", description="Book Description", rating=3),
-    Book(id=6, title="HP3", author="Author 3", description="Book Description", rating=1),
+    Book(id=1, title="Computer Science Pro", author="codingwithroby", description="A very nice book!", rating=5, published_date=2012),
+    Book(id=2, title="Be Fast with FastAPI", author="codingwithroby", description="A great book!", rating=5, published_date=2014),
+    Book(id=3, title="Master Endpoints", author="codingwithroby", description="A awesome book!", rating=5, published_date=2016),
+    Book(id=4, title="HP1", author="Author 1", description="Book Description", rating=2, published_date=2020),
+    Book(id=5, title="HP2", author="Author 2", description="Book Description", rating=3, published_date=2020),
+    Book(id=6, title="HP3", author="Author 3", description="Book Description", rating=1, published_date=2020),
 ]
 
 @app.get("/books")
@@ -65,6 +69,15 @@ async def read_book_by_rating(book_rating: int):
     books_to_return = []
     for book in BOOKS:
         if book.rating == book_rating:
+            books_to_return.append(book)
+    return books_to_return
+
+"Fetching Book by Published Date"
+@app.get("/books/publish/")
+async def read_book_by_publish_date(published_date: int):
+    books_to_return = []
+    for book in BOOKS:
+        if book.published_date == published_date:
             books_to_return.append(book)
     return books_to_return
 
