@@ -1,3 +1,4 @@
+from pydantic import BaseModel, Field
 from database import BASE
 from sqlalchemy import Column, Integer, String, Boolean
 
@@ -10,3 +11,10 @@ class Todos(BASE):
     description = Column(String)
     priority = Column(Integer)
     complete = Column(Boolean, default=False)
+
+
+class TodoRequest(BaseModel):
+    title: str = Field(min_length=3)
+    description: str = Field(min_length=3, max_length=100)
+    priority: int = Field(gt=0, lt=6)
+    complete: bool

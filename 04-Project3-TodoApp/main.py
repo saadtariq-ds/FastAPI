@@ -1,6 +1,6 @@
 from fastapi.params import Depends
 import models
-from models import Todos
+from models import Todos, TodoRequest
 from sqlalchemy.orm import Session
 from typing import Annotated
 from fastapi import FastAPI, Path, Query, HTTPException
@@ -35,3 +35,11 @@ async def read_todo_by_id(db: db_dependency, todo_id: int = Path(gt=0)):
     if todo_model is not None:
         return todo_model
     raise HTTPException(status_code=404, detail="Todo not Found")
+
+
+# Creating Data
+@app.post(path="/todo", status_code=status.HTTP_201_CREATED)
+async def create_todo(db: db_dependency, todo_request: TodoRequest):
+    todo_model = Todos(**todo_request.model_dump())
+    db.add(todo_model)
+    db.commit()
