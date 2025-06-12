@@ -1,75 +1,11 @@
-from fastapi.params import Depends
 import models
-from models import Todos, TodoRequest
-from sqlalchemy.orm import Session
-from typing import Annotated
-from fastapi import FastAPI, Path, Query, HTTPException
-from starlette import status
-from database import engine, SESSION_LOCAL
-from routers import auth
+from fastapi import FastAPI
+from database import engine
+from routers import auth, todos
 
 app = FastAPI()
 
 models.BASE.metadata.create_all(bind=engine)
 
 app.include_router(auth.router)
-
-
-def get_db():
-    db = SESSION_LOCAL()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-db_dependency = Annotated[Session, Depends(get_db)]
-
-# Fetching all the data
-@app.get(path="/", status_code=status.HTTP_200_OK)
-async def read_all(db: db_dependency):
-    return db.query(Todos).all()
-
-
-# Fetching Data by ID
-@app.get(path="/todo/{todo_id}", status_code=status.HTTP_200_OK)
-async def read_todo_by_id(db: db_dependency, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
-    if todo_model is not None:
-        return todo_model
-    raise HTTPException(status_code=404, detail="Todo not Found")
-
-
-# Creating Data
-@app.post(path="/todo", status_code=status.HTTP_201_CREATED)
-async def create_todo(db: db_dependency, todo_request: TodoRequest):
-    todo_model = Todos(**todo_request.model_dump())
-    db.add(todo_model)
-    db.commit()
-
-
-# Updating Data
-@app.put(path="/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_todo(db: db_dependency, todo_request: TodoRequest, todo_id:int = Path(gt=0)):
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
-    if todo_model is None:
-        return HTTPException(status_code=404, detail="Todo Not Found")
-
-    todo_model.title = todo_request.title
-    todo_model.description = todo_request.description
-    todo_model.priority = todo_request.priority
-    todo_model.complete = todo_request.complete
-
-    db.add(todo_model)
-    db.commit()
-
-
-# Deleting Data
-@app.delete(path="/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(db: db_dependency, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
-    if todo_model is None:
-        return HTTPException(status_code=404, detail="Todo Not Found")
-
-    db.query(Todos).filter(Todos.id == todo_id).delete()
-    db.commit()
+app.include_router(todos.router)
