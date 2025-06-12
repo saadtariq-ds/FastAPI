@@ -1,11 +1,17 @@
 from fastapi import APIRouter
+from passlib.utils.decor import deprecated_method
+
 from models import CreateUserRequest, Users
+from passlib.context import CryptContext
+
 
 router = APIRouter()
 
+bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
-@router.post("/auth/")
+
+@router.post("/auth")
 async def create_user(create_user_request: CreateUserRequest):
     create_user_model = Users(
         email=create_user_request.email,
@@ -13,7 +19,7 @@ async def create_user(create_user_request: CreateUserRequest):
         first_name=create_user_request.first_name,
         last_name=create_user_request.last_name,
         role=create_user_request.role,
-        hashed_password=create_user_request.password,
+        hashed_password=bcrypt_context.hash(create_user_request.password),
         is_active=True
     )
 
