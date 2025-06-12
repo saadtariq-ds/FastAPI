@@ -3,7 +3,7 @@ from database import BASE
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 
 
-class User(BASE):
+class Users(BASE):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -32,3 +32,12 @@ class TodoRequest(BaseModel):
     description: str = Field(min_length=3, max_length=100)
     priority: int = Field(gt=0, lt=6)
     complete: bool
+
+
+class CreateUserRequest(BaseModel):
+    username: str
+    email: str
+    first_name: str
+    last_name: str
+    password: str
+    role: str
