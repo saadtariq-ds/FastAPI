@@ -6,10 +6,13 @@ from typing import Annotated
 from fastapi import FastAPI, Path, Query, HTTPException
 from starlette import status
 from database import engine, SESSION_LOCAL
+from routers import auth
 
 app = FastAPI()
 
 models.BASE.metadata.create_all(bind=engine)
+
+app.include_router(auth.router)
 
 
 def get_db():
