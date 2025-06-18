@@ -22,8 +22,8 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 
 # Fetching all the data
 @router.get(path="/", status_code=status.HTTP_200_OK)
-async def read_all(db: db_dependency):
-    return db.query(Todos).all()
+async def read_all(user: user_dependency, db: db_dependency):
+    return db.query(Todos).filter(Todos.owner_id == user.get("id")).all()
 
 
 # Fetching Data by ID
