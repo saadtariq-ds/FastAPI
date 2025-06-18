@@ -23,13 +23,19 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 # Fetching all the data
 @router.get(path="/", status_code=status.HTTP_200_OK)
 async def read_all(user: user_dependency, db: db_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail="Authentication Failed")
     return db.query(Todos).filter(Todos.owner_id == user.get("id")).all()
 
 
 # Fetching Data by ID
 @router.get(path="/todo/{todo_id}", status_code=status.HTTP_200_OK)
-async def read_todo_by_id(db: db_dependency, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
+async def read_todo_by_id(user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)):
+    if user is None:
+        raise HTTPException(status_code=401, detail="Authentication Failed")
+
+    todo_model = (db.query(Todos).filter(Todos.id == todo_id)
+                  .filter(Todos.owner_id == user.get("id")).first())
     if todo_model is not None:
         return todo_model
     raise HTTPException(status_code=404, detail="Todo not Found")
